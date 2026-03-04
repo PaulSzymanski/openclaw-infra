@@ -55,6 +55,20 @@ jobs:
             done
           fi
 
+      - name: Delete orphaned staging firewalls
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+        run: |
+          FWS=$(hcloud firewall list -o noheader -o columns=id,name 2>/dev/null | grep "openclaw-staging" || true)
+          if [ -z "$FWS" ]; then
+            echo "No orphaned staging firewalls found."
+          else
+            echo "$FWS" | while read -r id name; do
+              echo "Deleting firewall: $name ($id)"
+              hcloud firewall delete "$id" || true
+            done
+          fi
+
       - name: Delete orphaned staging deploy keys
         env:
           GH_TOKEN: ${{ secrets.STAGING_GITHUB_TOKEN }}

@@ -269,3 +269,9 @@ jobs:
             | while read -r id; do
               hcloud ssh-key delete "$id" || true
             done
+          # Delete any lingering staging firewalls
+          hcloud firewall list -o noheader -o columns=id,name 2>/dev/null \
+            | grep "openclaw-staging" | awk '{print $1}' \
+            | while read -r id; do
+              hcloud firewall delete "$id" || true
+            done
