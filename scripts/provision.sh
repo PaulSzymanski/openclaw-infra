@@ -47,7 +47,7 @@ else
 
     # Required
     export PROVISION_GATEWAY_TOKEN=$(pulumi stack output openclawGatewayToken --show-secrets) || {
-        echo "ERROR: Failed to read gateway token from Pulumi. Is PULUMI_CONFIG_PASSPHRASE set?"
+        echo "ERROR: Failed to read gateway token from Pulumi. Are you logged in? (pulumi login)"
         exit 1
     }
     export PROVISION_CLAUDE_SETUP_TOKEN=$(pulumi config get claudeSetupToken) || {

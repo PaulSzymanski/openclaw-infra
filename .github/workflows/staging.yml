@@ -23,7 +23,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PULUMI_CONFIG_PASSPHRASE: ${{ secrets.STAGING_PULUMI_PASSPHRASE }}
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
   GH_TOKEN: ${{ secrets.STAGING_GITHUB_TOKEN }}
 
@@ -152,8 +152,7 @@ jobs:
           OBSIDIAN_VAULT_PASSWORD: ${{ secrets.OBSIDIAN_VAULT_PASSWORD }}
         run: |
           cd pulumi
-          pulumi login --local
-          pulumi stack init staging
+          pulumi stack select staging 2>/dev/null || pulumi stack init staging
 
           # Server config
           pulumi config set serverName openclaw-staging
@@ -253,9 +252,8 @@ jobs:
         if: always()
         run: |
           cd pulumi
-          pulumi login --local 2>/dev/null || true
           pulumi destroy --yes --stack staging 2>/dev/null || true
-          pulumi stack rm staging --yes 2>/dev/null || true
+          pulumi stack rm staging --yes --force 2>/dev/null || true
 
       - name: Clean up orphaned Hetzner resources
         if: always()

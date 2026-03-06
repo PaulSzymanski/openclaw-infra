@@ -242,7 +242,7 @@ Default server type is **CX33** (4 vCPU, 8 GB RAM). Upgrade to **CX43** (8 vCPU,
 
 | Secret | Purpose | Where to regenerate |
 |--------|---------|---------------------|
-| Pulumi passphrase | Encrypts Pulumi state | Cannot recover — must redeploy if lost |
+| Pulumi access token | Authenticates with Pulumi Cloud | app.pulumi.com → Settings → Access Tokens |
 | Hetzner API token | Creates/manages VPS | console.hetzner.cloud → Project → API Tokens |
 | Tailscale auth key | Joins server to your network | login.tailscale.com/admin/settings/keys |
 | Claude setup token | Powers OpenClaw (flat fee) | `claude setup-token` in terminal |
@@ -268,7 +268,7 @@ Default server type is **CX33** (4 vCPU, 8 GB RAM). Upgrade to **CX43** (8 vCPU,
 - Use `pulumi config set --secret` for sensitive values
 - Run `./scripts/verify.sh` after deployment
 - Check that no public ports are exposed
-- Store your Pulumi passphrase in a password manager
+- Keep Pulumi Cloud access token scoped to this project
 - **Cloud-init log is minimal** (Tailscale bootstrap only, no secrets beyond auth key)
 - **Monitor Tailscale admin console** for unauthorized devices: https://login.tailscale.com/admin/machines
 - **Rotate Tailscale auth keys periodically** (see [Key Rotation](#key-rotation) below)
@@ -279,7 +279,7 @@ Default server type is **CX33** (4 vCPU, 8 GB RAM). Upgrade to **CX43** (8 vCPU,
 - Never share Hetzner tokens between high-risk and production projects
 - Never add inbound firewall rules
 - Never bind OpenClaw to 0.0.0.0
-- Never commit `.env` files, API keys, or Pulumi passphrase
+- Never commit `.env` files or API keys
 - Never use password SSH authentication
 
 ### Key Rotation
@@ -290,7 +290,8 @@ Update secret via `pulumi config set <key> --secret`, then `pulumi up`. Tailscal
 
 ```bash
 cd pulumi
-pulumi stack init prod   # set a passphrase and save it — required for all future pulumi commands
+pulumi login   # authenticate with Pulumi Cloud
+pulumi stack init prod
 
 # Required secrets
 pulumi config set hcloud:token --secret
@@ -327,10 +328,6 @@ New browser or CLI client requires one-time approval:
 3. Refresh browser — authenticated via Tailscale identity
 
 Fallback if pairing fails: `pulumi stack output tailscaleUrlWithToken --show-secrets`
-
-### Pulumi Passphrase
-
-`PULUMI_CONFIG_PASSPHRASE` env var must be set for every `pulumi` command (encrypts local state). Export for session or set per-command: `PULUMI_CONFIG_PASSPHRASE="..." pulumi up`. Without it, all Pulumi commands fail.
 
 ## Workspace Git Sync (Optional)
 

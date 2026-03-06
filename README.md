@@ -67,7 +67,8 @@ To enable optional Telegram notifications:
 ```bash
 npm install
 cd pulumi
-pulumi stack init prod  # Save this passphrase — you need it for every pulumi command
+pulumi login             # Authenticate with Pulumi Cloud
+pulumi stack init prod
 
 # Required
 pulumi config set hcloud:token --secret       # Hetzner API token
@@ -92,7 +93,7 @@ cd ..
 > After verifying, clean up the cloud-init log (contains secrets):
 > `ssh ubuntu@openclaw-vps.<tailnet>.ts.net "sudo shred -u /var/log/cloud-init-openclaw.log"`
 
-See [CLAUDE.md](./CLAUDE.md#pulumi-passphrase) for passphrase management options.
+State and secrets are managed by [Pulumi Cloud](https://app.pulumi.com) — no local passphrase needed.
 
 ## Access
 

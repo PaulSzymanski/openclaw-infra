@@ -153,7 +153,6 @@ const { server, sshKey, privateKey } = createServer({
 const provisionEnv: Record<string, pulumi.Input<string>> = {
     // Pass all secrets directly so provision.sh doesn't need to
     // call `pulumi stack output` (which can't read in-flight state)
-    PULUMI_CONFIG_PASSPHRASE: process.env.PULUMI_CONFIG_PASSPHRASE || "",
     PROVISION_AGENT_IDS: agentIds.join(","),
     PROVISION_GATEWAY_TOKEN: gatewayToken.result,
     PROVISION_CLAUDE_SETUP_TOKEN: claudeSetupToken,

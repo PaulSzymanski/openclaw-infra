@@ -19,16 +19,14 @@ Common issues and solutions for the OpenClaw deployment.
 
 ## Deployment Issues
 
-### Pulumi "passphrase must be set" error
+### Pulumi authentication error
 
-**Symptom**: Any `pulumi` command fails with passphrase error.
+**Symptom**: Any `pulumi` command fails with authentication error.
 
 **Solution**:
 ```bash
-export PULUMI_CONFIG_PASSPHRASE="your-passphrase"
+pulumi login   # Authenticate with Pulumi Cloud
 ```
-
-See [CLAUDE.md — Pulumi Passphrase](../CLAUDE.md#pulumi-passphrase) for options.
 
 ### Provision fails with empty secret validation error
 
