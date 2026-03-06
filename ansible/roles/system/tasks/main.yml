@@ -28,6 +28,36 @@
       - inotify-tools       # inotifywait for qmd recursive file watching
     state: present
 
+- name: Check if Node.js is installed
+  ansible.builtin.command: node --version
+  register: node_installed
+  changed_when: false
+  failed_when: false
+
+- name: Install Node.js 20 LTS via NodeSource
+  when: node_installed.rc != 0
+  block:
+    - name: Add NodeSource GPG key and repository
+      ansible.builtin.shell: |
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      args:
+        executable: /bin/bash
+
+    - name: Install nodejs package
+      ansible.builtin.apt:
+        name: nodejs
+        state: present
+        update_cache: true
+
+- name: Configure npm global prefix for ubuntu user
+  ansible.builtin.shell: |
+    mkdir -p /home/ubuntu/.npm-global
+    npm config set prefix "/home/ubuntu/.npm-global"
+  args:
+    executable: /bin/bash
+    creates: /home/ubuntu/.npm-global
+  become: false
+
 - name: Set git default branch to main
   community.general.git_config:
     name: init.defaultBranch
