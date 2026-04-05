@@ -253,6 +253,9 @@
         # Control UI
         check_set gateway.controlUi.enabled true
         check_set gateway.controlUi.allowInsecureAuth false
+        {% if _tailscale_wss_url | default('') | length > 0 %}
+        check_set_json gateway.controlUi.allowedOrigins '["https://{{ _tailscale_wss_url | regex_replace("^wss://", "") }}"]'
+        {% endif %}
 
         # Auth: Tailscale identity
         check_set gateway.auth.allowTailscale true
@@ -363,6 +366,11 @@
         # Concurrency: allow more parallel sessions across all agents
         check_set agents.defaults.maxConcurrent "{{ openclaw_max_concurrent }}"
         check_set agents.defaults.subagents.maxConcurrent "{{ openclaw_subagents_max_concurrent }}"
+        {% if openclaw_subagents_model | default('') | length > 0 %}
+        check_set agents.defaults.subagents.model "{{ openclaw_subagents_model }}"
+        {% else %}
+        check_unset agents.defaults.subagents.model
+        {% endif %}
 
         # Context pruning: trim stale tool outputs after 15m, keep last 3 assistant responses
         check_set agents.defaults.contextPruning.mode cache-ttl
