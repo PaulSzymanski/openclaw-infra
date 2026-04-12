@@ -99,7 +99,7 @@ Use `./scripts/provision.sh --tags <tag>` to run specific roles:
 | `docker` | docker | Docker upgrade or group changes |
 | `ufw` | ufw | Firewall rule changes |
 | `openclaw` | openclaw | Reinstall/update OpenClaw binary |
-| `config` | config | Change model, sandbox mode, tool allowlist, elevated tools, auth settings, node exec |
+| `config` | config | Change model, sub-agent model, sandbox mode, tool allowlist, elevated tools, auth settings, node exec |
 | `agents` | agents | Add/remove non-default agents, update Telegram bindings |
 | `telegram` | telegram | Update cron prompts or Telegram channel config |
 | `whatsapp` | whatsapp | Configure WhatsApp channel for agents using `deliver_channel: whatsapp` |
@@ -256,7 +256,7 @@ Default server type is **CX43** (8 vCPU, 16 GB RAM, ~€9.49/mo). Change with `p
 | xAI API key | (Optional) Enables web search via Grok | x.ai/api → API Keys |
 | Groq API key | (Optional) Enables voice transcription via Whisper | console.groq.com → API Keys |
 | Gemini API key | (Optional) Enables image generation via Google Gemini | aistudio.google.com → API Keys |
-| Codex auth (`~/.codex/auth.json`) | (Optional) Powers Codex MCP servers for coding assistance | Run `codex login` locally, auto-deployed by provision.sh |
+| Codex auth (`~/.codex/auth.json`) | (Optional) Powers Codex MCP servers for coding assistance + sub-agent model provider (`openai-codex`) | Run `codex login` locally, auto-deployed by provision.sh. One-time `openclaw models auth login --provider openai-codex` on VPS for model access |
 | Obsidian auth token | (Optional) Authenticates with Obsidian Sync API | `ob login` locally, copy from `~/.obsidian-headless/auth_token` |
 | Obsidian vault password | (Optional) E2EE encryption for Obsidian Sync vaults | User-chosen password |
 
@@ -472,6 +472,26 @@ MCP servers, workspaces, deny rules, and token mappings are generated automatica
 `config` -> `agents` -> `telegram` -> `whatsapp` -> `discord` -> `obsidian-headless` -> `qmd` -> `plugins` -> `sandbox` -> `workspace`
 
 Telegram must run immediately after agents (prevents message misrouting). Plugins after qmd (qmd binary needed for MCP registration).
+
+### Sub-Agent Model (OpenAI Codex)
+
+Sub-agents default to `openai-codex/gpt-5.4` via the built-in `openai-codex` provider, which routes through `chatgpt.com/backend-api/codex/responses` using ChatGPT OAuth — no separate OpenAI API key needed. Controlled by `openclaw_subagents_model` in `group_vars/all.yml`.
+
+**One-time setup** (interactive TTY required — cannot be automated via Ansible):
+
+```bash
+ssh ubuntu@openclaw-vps 'openclaw models auth login --provider openai-codex'
+```
+
+**Apply config:**
+
+```bash
+./scripts/provision.sh --tags config
+```
+
+**Available models** via Codex subscription: `gpt-5.3-codex`, `gpt-5.3-codex-spark` (Pro only), `gpt-5.4`, `gpt-5.4-mini`. ChatGPT OAuth tokens cannot access `api.openai.com` — only the `chatgpt.com` backend endpoint.
+
+**Known issue:** openclaw/openclaw#47358 — config-layer sub-agent model defaults may be silently ignored. The runtime `model` parameter in `sessions_spawn` calls is the reliable workaround.
 
 ## Sandboxing
 

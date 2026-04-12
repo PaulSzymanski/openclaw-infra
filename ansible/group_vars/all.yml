@@ -67,6 +67,7 @@ openclaw_compaction_notify_user: true   # show "Compacting context..." notice in
 # Concurrency settings
 openclaw_max_concurrent: 8
 openclaw_subagents_max_concurrent: 16
+openclaw_subagents_model: "openai-codex/gpt-5.4"
 
 # Node exec settings (for remote Mac node control)
 # ⚠️  SECURITY WARNING: Node exec lets agents run arbitrary shell commands on your
